@@ -14,6 +14,7 @@ import debounce from 'lodash.debounce';
 
 import { callbackHandler } from './callback';
 import { isCallbackSet } from './callback';
+import { RedisPersistence } from 'y-redis';
 
 const CALLBACK_DEBOUNCE_WAIT =
   parseInt(process.env.CALLBACK_DEBOUNCE_WAIT as string) || 2000;
@@ -27,7 +28,6 @@ const wsReadyStateClosed = 3; // eslint-disable-line
 
 // disable gc when using snapshots!
 const gcEnabled = process.env.GC !== 'false' && process.env.GC !== '0';
-const persistenceDir = process.env.YPERSISTENCE;
 
 type Persistence = {
   bindState: (a: string, b: WSSharedDoc) => void;
@@ -37,21 +37,16 @@ type Persistence = {
 
 let persistence: Persistence = null;
 
-if (typeof persistenceDir === 'string') {
-  console.info('Persisting documents to "' + persistenceDir + '"');
-  // @ts-ignore
-  const LeveldbPersistence = require('y-leveldb').LeveldbPersistence;
-  const ldb = new LeveldbPersistence(persistenceDir);
+const REDIS_URI = process.env.REDIS_URI;
+
+if (typeof REDIS_URI === 'string') {
+  console.info('Persisting documents to "' + REDIS_URI + '"');
+  const rp = new RedisPersistence({ redisOpts: REDIS_URI });
   persistence = {
-    provider: ldb,
+    provider: rp,
     bindState: async (docName, ydoc) => {
-      const persistedYdoc = await ldb.getYDoc(docName);
-      const newUpdates = Y.encodeStateAsUpdate(ydoc);
-      ldb.storeUpdate(docName, newUpdates);
-      Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
-      ydoc.on('update', (update) => {
-        ldb.storeUpdate(docName, update);
-      });
+      rp.closeDoc(docName);
+      return rp.bindState(docName, ydoc);
     },
     writeState: async (docName, ydoc) => {},
   };

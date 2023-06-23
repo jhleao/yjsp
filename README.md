@@ -11,3 +11,7 @@ yarn dev
 ```
 
 Server will run on `ws://localhost:1234` and client on `http://localhost:3000` by default.
+
+## Branches
+
+- `tiptap`: basic TipTap + yjs [setup](https://tiptap.dev/guide/collaborative-editing), without their "hocuspocus" backend. Optionally uses y-redis for persistence (`REDIS_URI` env var)
