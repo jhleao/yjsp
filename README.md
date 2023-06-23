@@ -4,7 +4,7 @@ This is the most barebones yjs implementation I could get together. It's just a 
 
 ## Running
 
-Install yarn with `npm i -g yarn`, install deps with `yarn install` and run the app with
+Install yarn with `npm i -g yarn`, install deps with `yarn` and run the app with
 
 ```
 yarn dev
@@ -14,4 +14,4 @@ Server will run on `ws://localhost:1234` and client on `http://localhost:3000` b
 
 ## Branches
 
-- `tiptap`: basic TipTap + yjs [setup](https://tiptap.dev/guide/collaborative-editing), without their "hocuspocus" backend. Optionally uses y-redis for persistence (`REDIS_URI` env var)
+- `tiptap`: basic TipTap + yjs setup, without the [hocuspocus](https://tiptap.dev/guide/collaborative-editing) backend. Optionally uses y-redis for persistence (`REDIS_URI` env var)
